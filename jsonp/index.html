@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>jsonp跨域</title>
+    <link rel="stylesheet" href="">
+</head>
+
+<body>
+    <script>
+    	//前端
+	    function jsonp({ url, params, cb }) {
+	        return new Promise((resolve, reject)=>{
+	        	let script = document.createElement('script');
+	        	window[cb] = function (data) {
+	        		resolve(data);
+	        		document.body.removeChild(script);
+	        	}
+	        	params = {...params,cb};//{wd: "小米", cb: "show"} es6属性的简洁用法
+	        	let arrs = [];
+	        	for(let key in params) { //for...in 语句用于遍历数组或者对象的属性
+	        		arrs.push(`${key}=${params[key]}`)
+	        	}
+	        	script.src = `${url}?${arrs.join('&')}`
+	        	document.body.appendChild(script);
+	        })
+	    }
+	    //只能发送get请求 不支持post put delete
+	    //不安全 xss攻击 不安全
+	    jsonp({
+	    	url: 'http://localhost:3000/say',
+	    	params: {wd: '小米'},
+	    	cb: 'show'
+	    }).then(data=>{
+	    	console.log(data)
+	    })
+    </script>
+</body>
+
+</html>
